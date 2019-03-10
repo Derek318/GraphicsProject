@@ -21,6 +21,12 @@ void BlinnPhongMaterial::SetSpecular(glm::vec3 inputColor, float inputShininess)
     shininess = inputShininess;
 }
 
+glm::vec3 BlinnPhongMaterial::ComputeAmbient(const IntersectionState& intersection) const
+{
+    const glm::vec3 useAmbientColor = (textureStorage.find("ambientTexture") != textureStorage.end()) ? glm::vec3(textureStorage.at("ambientTexture")->Sample(intersection.ComputeUV())) : ambientColor;
+    return useAmbientColor;
+}
+
 glm::vec3 BlinnPhongMaterial::ComputeDiffuse(const IntersectionState& intersection, const glm::vec3& lightColor, const float NdL, const float NdH, const float NdV, const float VdH) const
 {
     const glm::vec3 useDiffuseColor = (textureStorage.find("diffuseTexture") != textureStorage.end()) ? glm::vec3(textureStorage.at("diffuseTexture")->Sample(intersection.ComputeUV())) : diffuseColor;
@@ -33,7 +39,7 @@ glm::vec3 BlinnPhongMaterial::ComputeSpecular(const IntersectionState& intersect
 {
     const glm::vec3 useSpecularColor = (textureStorage.find("specularTexture") != textureStorage.end()) ? glm::vec3(textureStorage.at("specularTexture")->Sample(intersection.ComputeUV())) : specularColor;
     const float highlight = std::pow(NdH, shininess);
-    const glm::vec3 specularResponse = highlight * specularColor * lightColor;
+    const glm::vec3 specularResponse = highlight * useSpecularColor * lightColor;
     return specularResponse;
 }
 
@@ -50,9 +56,19 @@ void BlinnPhongMaterial::LoadMaterialFromAssimp(std::shared_ptr<aiMaterial> assi
 
     Material::LoadMaterialFromAssimp(assimpMaterial);
 
+    assimpMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, glm::value_ptr(ambientColor), nullptr);
     assimpMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, glm::value_ptr(diffuseColor), nullptr);
     assimpMaterial->Get(AI_MATKEY_COLOR_SPECULAR, glm::value_ptr(specularColor), nullptr);
     assimpMaterial->Get(AI_MATKEY_SHININESS, &shininess, nullptr);
+    
+    if (assimpMaterial->GetTextureCount(aiTextureType_AMBIENT)) {
+        aiString aiAmbientPath;
+        assimpMaterial->GetTexture(aiTextureType_AMBIENT, 0, &aiAmbientPath);
+        std::string ambientPath(aiAmbientPath.C_Str());
+        SetTexture("ambientTexture", TextureLoader::LoadTexture(ambientPath));
+    }
+    
+    
     if (assimpMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
         aiString aiDiffusePath;
         assimpMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiDiffusePath);

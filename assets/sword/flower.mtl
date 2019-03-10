@@ -1,0 +1,26 @@
+# Blender MTL File: 'flower.blend'
+# Material Count: 2
+
+newmtl Lotus_Petal
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /sword/lotus_petal_diffuse.jpg
+map_Pr /sword/lotus_petal_glossiness.jpg
+bump /sword/lotus_petal_bump.jpg
+
+newmtl Lotus_Stamen
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /sword/lotus_stamen_diffuse.jpg
